@@ -1,0 +1,401 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <time.h>
+
+#define TECLA_CIMA 'w'
+#define TECLA_BAIXO 's'
+#define TECLA_ESQUERDA 'a'
+#define TECLA_DIREITA 'd'
+#define TECLA_INTERAGIR 'i'
+#define TECLA_REINICIAR 'r'
+#define TECLA_SAIR 'q'
+
+typedef struct {
+    int x, y;
+} Personagem;
+
+typedef struct {
+    char mapa[40][40];
+    int chave_x, chave_y;
+    int porta_x, porta_y;
+    int porta_trancada;
+    int botao_x, botao_y;
+    int espinho_x, espinho_y;
+    int monstro_x, monstro_y;
+    int teletransporte1_x, teletransporte1_y;
+    int teletransporte2_x, teletransporte2_y;
+} Mapa;
+
+Mapa mapas[3];
+
+const int LARGURA_MAPA = 40;
+const int ALTURA_MAPA = 40;
+
+void limparTela() {
+    system("cls");
+}
+
+void esperarTecla() {
+    printf("\nPressione uma tecla para continuar...");
+    while (getch() == 0);
+}
+
+void imprimirMenuPrincipal() {
+    limparTela();
+    printf("=== MENU PRINCIPAL ===\n");
+    printf("1. Iniciar Jogo\n");
+    printf("2. Tutorial\n");
+    printf("3. Sair do Jogo\n");
+}
+
+void processarEscolhaMenuPrincipal() {
+    char escolha;
+    printf("Escolha uma opcao: ");
+    scanf(" %c", &escolha);
+
+    switch (escolha) {
+        case '1':
+            printf("Iniciando o jogo...\n");
+            break;
+        case '2':
+            limparTela();
+            printf("=== TUTORIAL ===\n");
+            printf("BEM-VINDO AO:\n\n<=====}--Â§>DANGEUN CRAWLER<Â§--{=====>\n\nA seguir voce vera as instrucoes do jogo.\n\nTECLADO:\nW: mover-se uma unidade para cima.\nA: mover-se uma unidade para a esquerda.\nS: mover-se uma unidade para baixo.\nD: mover-se uma unidade para a direita.\nI: interagir com o objeto acima.\n\nELEMENTOS DO JOGO:\n&: Simbolo que representa o jogador, ou seja, voce.\n*: Simbolo que representa uma parede, que voce nao pode atravessar.\n@: simbolo que representa a chave para abrir a porta e finalizar a fase, a porta abre quando voce interage com a chave.\nD: simbolo que representa a porta fechada.\n=: Simbolo que representa a porta aberta quando voce interage com a chave.\nO: Simbolo que representa um botao que voce pode interagir, o botao esta no chao e voce deve ficar em cima dele para interagir.\n+: Simbolo que representa um espinho. A fase nao e  reiniciada quando voce toca no espinho, se isso acontecer tres vezes, o jogo volta para o menu principal.\n>: Simbolo que representa um teletransporte. O teletransporte sempre possui um par, quando voce toca em um,  transportado para o outro e vice-versa.\n\n");
+            esperarTecla();
+            break;
+        case '3':
+            printf("Saindo do jogo...\n");
+            exit(0);
+            break;
+        default:
+            printf("Opcao invalida!\n");
+            esperarTecla();
+            break;
+    }
+}
+
+void inicializarMapas() {
+    
+    mapas[0].chave_x = 9;
+    mapas[0].chave_y = 2;
+    mapas[0].porta_x = 11;
+    mapas[0].porta_y = 7;
+    mapas[0].porta_trancada = 1;
+    mapas[0].botao_x = 15;
+    mapas[0].botao_y = 3;
+    mapas[0].espinho_x = 5;
+    mapas[0].espinho_y = 8;
+    mapas[0].monstro_x = -1; 
+    mapas[0].monstro_y = -1;
+    mapas[0].teletransporte1_x = -1;
+    mapas[0].teletransporte1_y = -1;
+    mapas[0].teletransporte2_x = -1;
+    mapas[0].teletransporte2_y = -1;
+
+    snprintf(mapas[0].mapa[0], 20, "###################");
+    snprintf(mapas[0].mapa[1], 20, "#                 #");
+    snprintf(mapas[0].mapa[2], 20, "#        @        #");
+    snprintf(mapas[0].mapa[3], 20, "#                 #");
+    snprintf(mapas[0].mapa[4], 20, "#        #####    #");
+    snprintf(mapas[0].mapa[5], 20, "#        #   #    #");
+    snprintf(mapas[0].mapa[6], 20, "#        #   #    #");
+    snprintf(mapas[0].mapa[7], 20, "#        #   #    #");
+    snprintf(mapas[0].mapa[8], 20, "#                 #");
+    snprintf(mapas[0].mapa[9], 20, "###################");
+
+    
+    mapas[1].chave_x = 9;
+    mapas[1].chave_y = 2;
+    mapas[1].porta_x = 11;
+    mapas[1].porta_y = 7;
+    mapas[1].porta_trancada = 1;
+    mapas[1].botao_x = 15;
+    mapas[1].botao_y = 3;
+    mapas[1].espinho_x = 5;
+    mapas[1].espinho_y = 8;
+    mapas[1].monstro_x = 2;
+    mapas[1].monstro_y = 5;
+    mapas[1].teletransporte1_x = -1;
+    mapas[1].teletransporte1_y = -1;
+    mapas[1].teletransporte2_x = -1;
+    mapas[1].teletransporte2_y = -1;
+
+    snprintf(mapas[1].mapa[0], 20, "###################");
+    snprintf(mapas[1].mapa[1], 20, "#                 #");
+    snprintf(mapas[1].mapa[2], 20, "#                 #");
+    snprintf(mapas[1].mapa[3], 20, "#                 #");
+    snprintf(mapas[1].mapa[4], 20, "#                 #");
+    snprintf(mapas[1].mapa[5], 20, "#                 #");
+    snprintf(mapas[1].mapa[6], 20, "#                 #");
+    snprintf(mapas[1].mapa[7], 20, "#                 #");
+    snprintf(mapas[1].mapa[8], 20, "#                 #");
+    snprintf(mapas[1].mapa[9], 20, "#                 #");
+    snprintf(mapas[1].mapa[10], 20, "#                 #");
+    snprintf(mapas[1].mapa[11], 20, "#                 #");
+    snprintf(mapas[1].mapa[12], 20, "#                 #");
+    snprintf(mapas[1].mapa[13], 20, "#                 #");
+    snprintf(mapas[1].mapa[14], 20, "#                 #");
+    snprintf(mapas[1].mapa[15], 20, "#                 #");
+    snprintf(mapas[1].mapa[16], 20, "#                 #");
+    snprintf(mapas[1].mapa[17], 20, "#                 #");
+    snprintf(mapas[1].mapa[18], 20, "#                 #");
+    snprintf(mapas[1].mapa[19], 20, "###################");
+
+    
+    mapas[2].chave_x = 19;
+    mapas[2].chave_y = 2;
+    mapas[2].porta_x = 35;
+    mapas[2].porta_y = 37;
+    mapas[2].porta_trancada = 1;
+    mapas[2].botao_x = 25;
+    mapas[2].botao_y = 3;
+    mapas[2].espinho_x = 10;
+    mapas[2].espinho_y = 20;
+    mapas[2].monstro_x = 2;
+    mapas[2].monstro_y = 5;
+    mapas[2].teletransporte1_x = 5;
+    mapas[2].teletransporte1_y = 35;
+    mapas[2].teletransporte2_x = 30;
+    mapas[2].teletransporte2_y = 5;
+
+	int i;
+	int j;
+    for ( i = 0; i < 40; i++) {
+        for ( j = 0; j < 40; j++) {
+            if (i == 0 || i == 39 || j == 0 || j == 39) {
+                mapas[2].mapa[i][j] = '#';
+            } else {
+                mapas[2].mapa[i][j] = ' ';
+            }
+        }
+    }
+}
+
+void imprimirMapaComPersonagem(Personagem jogador, Mapa mapa, int vida) {
+    printf("Vida: ");
+    int v;
+    for ( v = 0; v < vida; v++) {
+        printf("<3 ");
+    }
+    printf("\n");
+    int i;
+    int j;
+    for ( i = 0; i < ALTURA_MAPA; i++) {
+        for ( j = 0; j < LARGURA_MAPA; j++) {
+            if (i == jogador.y && j == jogador.x) {
+                printf("&");
+            } else if (i == mapa.chave_y && j == mapa.chave_x) {
+                if (mapa.porta_trancada) {
+                    printf("@");
+                } else {
+                    printf(" ");
+                }
+            } else if (i == mapa.porta_y && j == mapa.porta_x) {
+                if (mapa.porta_trancada) {
+                    printf("D");
+                } else {
+                    printf("=");
+                }
+            } else if (i == mapa.botao_y && j == mapa.botao_x) {
+                printf("O");
+            } else if (i == mapa.espinho_y && j == mapa.espinho_x) {
+                printf("+");
+            } else if (i == mapa.monstro_y && j == mapa.monstro_x) {
+                printf("X");
+            } else if (i == mapa.teletransporte1_y && j == mapa.teletransporte1_x) {
+                printf("<");
+            } else if (i == mapa.teletransporte2_y && j == mapa.teletransporte2_x) {
+                printf(">");
+            } else {
+                printf("%c", mapa.mapa[i][j]);
+            }
+        }
+        printf("\n");
+    }
+}
+
+void gameOver(Personagem *jogador, int *colisoesEspinho, int *vida) {
+    printf("\nGame Over! Voce perdeu.\n");
+    printf("Escolha uma opcao:\n");
+    printf("1. Reiniciar o mapa\n");
+    printf("2. Sair do jogo\n");
+    char escolha;
+    scanf(" %c", &escolha);
+    switch (escolha) {
+        case '1':
+            jogador->x = 1;
+            jogador->y = 1;
+            *colisoesEspinho = 0;
+            *vida = 3; 
+            break;
+        case '2':
+            exit(0);
+            break;
+        default:
+            printf("Opcao invalida!\n");
+            break;
+    }
+}
+
+void atualizarPosicaoPersonagem(Personagem *jogador, char entrada, Mapa *mapa, int *colisoesEspinho, int *vida) {
+    switch (entrada) {
+        case TECLA_CIMA:
+            if (jogador->y > 0 && mapa->mapa[jogador->y - 1][jogador->x] != '#') {
+                jogador->y--;
+            }
+            break;
+        case TECLA_BAIXO:
+            if (jogador->y < ALTURA_MAPA - 1 && mapa->mapa[jogador->y + 1][jogador->x] != '#') {
+                jogador->y++;
+            }
+            break;
+        case TECLA_ESQUERDA:
+            if (jogador->x > 0 && mapa->mapa[jogador->y][jogador->x - 1] != '#') {
+                jogador->x--;
+            }
+            break;
+        case TECLA_DIREITA:
+            if (jogador->x < LARGURA_MAPA - 1 && mapa->mapa[jogador->y][jogador->x + 1] != '#') {
+                jogador->x++;
+            }
+            break;
+        case TECLA_INTERAGIR:
+            if (jogador->x == mapa->botao_x && jogador->y == mapa->botao_y) {
+                printf("Nao saia apertando coisas que voce nao sabe!\n");
+                gameOver(jogador, colisoesEspinho, vida);
+            } else if (jogador->x == mapa->chave_x && jogador->y == mapa->chave_y && mapa->porta_trancada) {
+                mapa->porta_trancada = 0;
+                mapa->mapa[mapa->chave_y][mapa->chave_x] = ' ';
+            }
+            break;
+        default:
+            break;
+    }
+
+    
+    if (jogador->x == mapa->espinho_x && jogador->y == mapa->espinho_y) {
+        (*colisoesEspinho)++;
+        if (*colisoesEspinho >= 3) {
+            gameOver(jogador, colisoesEspinho, vida);
+        } else {
+            *vida -= 2;
+        }
+    }
+
+    
+    if (jogador->x == mapa->monstro_x && jogador->y == mapa->monstro_y) {
+        *vida -= 2;
+        gameOver(jogador, colisoesEspinho, vida);
+    }
+
+    
+    if (jogador->x == mapa->teletransporte1_x && jogador->y == mapa->teletransporte1_y) {
+        jogador->x = mapa->teletransporte2_x;
+        jogador->y = mapa->teletransporte2_y;
+    } else if (jogador->x == mapa->teletransporte2_x && jogador->y == mapa->teletransporte2_y) {
+        jogador->x = mapa->teletransporte1_x;
+        jogador->y = mapa->teletransporte1_y;
+    }
+}
+
+int jogadorVenceu(Personagem jogador, Mapa mapa) {
+    return (jogador.x == mapa.porta_x && jogador.y == mapa.porta_y && !mapa.porta_trancada);
+}
+
+void movimentoAleatorioMonstro(Mapa *mapa, Personagem jogador) {
+    int movimento = rand() % 4;
+
+    switch (movimento) {
+        case 0:
+            if (mapa->monstro_y > 0 && mapa->mapa[mapa->monstro_y - 1][mapa->monstro_x] != '#') {
+                mapa->monstro_y--;
+            }
+            break;
+        case 1:
+            if (mapa->monstro_y < ALTURA_MAPA - 1 && mapa->mapa[mapa->monstro_y + 1][mapa->monstro_x] != '#') {
+                mapa->monstro_y++;
+            }
+            break;
+        case 2:
+            if (mapa->monstro_x > 0 && mapa->mapa[mapa->monstro_y][mapa->monstro_x - 1] != '#') {
+                mapa->monstro_x--;
+            }
+            break;
+        case 3:
+            if (mapa->monstro_x < LARGURA_MAPA - 1 && mapa->mapa[mapa->monstro_y][mapa->monstro_x + 1] != '#') {
+                mapa->monstro_x++;
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+void perseguirJogador(Mapa *mapa, Personagem jogador) {
+    if (mapa->monstro_x < jogador.x && mapa->mapa[mapa->monstro_y][mapa->monstro_x + 1] != '#') {
+        mapa->monstro_x++;
+    } else if (mapa->monstro_x > jogador.x && mapa->mapa[mapa->monstro_y][mapa->monstro_x - 1] != '#') {
+        mapa->monstro_x--;
+    } else if (mapa->monstro_y < jogador.y && mapa->mapa[mapa->monstro_y + 1][mapa->monstro_x] != '#') {
+        mapa->monstro_y++;
+    } else if (mapa->monstro_y > jogador.y && mapa->mapa[mapa->monstro_y - 1][mapa->monstro_x] != '#') {
+        mapa->monstro_y--;
+    }
+}
+
+int main() {
+    srand(time(NULL));
+
+    printf("BEM-VINDO AO:\n\n<=====}--Â§>DANGEUN CRAWLER<Â§--{=====>\n");
+
+    inicializarMapas();
+
+    int faseAtual = 0;
+    while (1) {
+        imprimirMenuPrincipal();
+        processarEscolhaMenuPrincipal();
+        if (getch() == 13) {
+            break;
+        }
+    }
+
+    limparTela();
+
+    Personagem jogador = {1, 1};
+    int colisoesEspinho = 0;
+    int vida = 3;
+    imprimirMapaComPersonagem(jogador, mapas[faseAtual], vida);
+
+    while (1) {
+        if (kbhit()) {
+            char entrada = getch();
+            atualizarPosicaoPersonagem(&jogador, entrada, &mapas[faseAtual], &colisoesEspinho, &vida);
+            if (mapas[faseAtual].monstro_x != -1) {
+                movimentoAleatorioMonstro(&mapas[faseAtual], jogador);
+                if (faseAtual == 2) {
+                    perseguirJogador(&mapas[faseAtual], jogador);
+                }
+            }
+            limparTela();
+            imprimirMapaComPersonagem(jogador, mapas[faseAtual], vida);
+            if (jogadorVenceu(jogador, mapas[faseAtual])) {
+                printf("\nParabens! Voce abriu a porta e venceu a fase!\n");
+                esperarTecla();
+                faseAtual++;
+                if (faseAtual >= 3) {
+                } else {
+                    limparTela();
+                    jogador.x = 1;
+                    jogador.y = 1;
+                    colisoesEspinho = 0;
+                    vida = 3;
+                    imprimirMapaComPersonagem(jogador, mapas[faseAtual], vida);
+                }
+            }
+        }
+    }
+
+    return 0;
+}
