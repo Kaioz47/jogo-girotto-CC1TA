@@ -1,6 +1,6 @@
 Participantes:Antonio Neto, Jose pereira, Kaio Márcio
 
-### Resumo de "Dangeun Crawler: A Jornada de Andariel"
+ "Dangeun Crawler: A Jornada de Andariel"
 
 Na terra de Valtoria, Andariel, uma jovem guerreira, decide se aventurar no lendário Dangeun Crawler para proteger seu povo das forças sombrias. No primeiro nível, ela encontra um labirinto repleto de espinhos e paredes intransponíveis. Com cuidado, recupera uma chave dourada e abre a porta para o próximo nível. 
 
